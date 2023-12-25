@@ -1,0 +1,18 @@
+import pyfirmata
+import time
+
+if __name__ == '__main__':
+    board = pyfirmata.Arduino('/dev/cu.usbmodem142101')
+anode = board.get_pin('d:3:p')
+cathode = board.get_pin('d:9:o')
+cathode.write(1)
+
+while True:
+    anode.write(0)
+    time.sleep(0.5)
+    anode.write(0.3)
+    time.sleep(0.5)
+    anode.write(0.6)
+    time.sleep(0.5)
+    anode.write(1)
+    time.sleep(0.5)
