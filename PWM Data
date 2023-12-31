@@ -1,0 +1,11 @@
+# Column 1: Pin
+# Column 2: Row
+# Column 3: Column
+# Column 4: Anode (1 = True, 0 = False for Row)
+
+3	1	0	1
+5	2	0	1
+6	3	0	1
+11	0	1	0
+12	0	2	0
+13	0	3	0
