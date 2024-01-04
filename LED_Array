@@ -103,7 +103,7 @@ def global_on(LED_array, read=True):
             row.mode = 0
             col.mode = 0
     
-def LED_flash(LED_array, LED_num, num_flashes, half_flash_length=0.5):
+def flash(LED_array, LED_num, num_flashes, half_flash_length=0.5):
     '''
     param dict LED_array: key=int corresponding to an LED, value=[anode_pin, cathode_pin]
     param int LED_num: Number corresponding to the LED that should flash
@@ -135,7 +135,7 @@ def LED_flash(LED_array, LED_num, num_flashes, half_flash_length=0.5):
         anode.mode = 0
         time.sleep(half_flash_length)
 
-def LED_PWM(LED_array, LED_num, duty_cycle, duration=0.5):
+def pwm(LED_array, LED_num, duty_cycle, duration=0.5):
     '''
     param dict LED_array: key=int corresponding to an LED, value=[anode_pin, cathode_pin]
     param int LED_num: Number corresponding to the LED that should turn on
