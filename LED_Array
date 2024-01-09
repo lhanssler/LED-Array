@@ -4,11 +4,13 @@ import numpy as np
 
 def board_initializer(port=None):
     '''
-    param str port: Location of Arduino board. Default None prompts user to input string
-    
-    Initializes connection with the Arduino board in port. Returns the board object.
+    Initializes connection with Arduino board.
+    Parameters:
+        port (string): Location of the port which Arduino is plugged into
+            Default Value: None    Triggers request for user to input port manually
+    Returns:
+        Arduino board object
     '''
-    
     if port == None:
         port = input('What is the port?')
     
@@ -17,14 +19,15 @@ def board_initializer(port=None):
 
 def LED_setup(pyboard, file):
     '''
-    param Arduino pyboard: Connection with the Arduino board
-    param ndarray file: Contents of the setup file fed from main as ndarray
-    
-    Initializes the LED setup as dict LED_array.
-    LED_array has key=LED_num (int corresponding to a given LED) and value=[anode_pin, cathode_pin].
-    Returns LED_array.
+    Reads the setup file to return a dictionary representing the ports in use on the Arduino board.
+    Parameters:
+        pyboard (board object): Arduino board object containing pins described in setup file
+        file (numpy array): ND array containing the contents of the setup file
+    Returns:
+        Dictionary representing the LEDs and their connections to the Arduino board
+            Keys are ints corresponding to LEDs; each LED is assigned an int key
+            Values are 1D lists containing Arduino pin objects on the board in the form [anode_pin, cathode_pin]
     '''
-    
     # Reading the initializing txt file to save which rows/cols correspond to which pins & which are anodes
     rows = {}; cols = {}
     for pin in file:
@@ -59,65 +62,75 @@ def LED_setup(pyboard, file):
 
 def global_off(LED_array):
     '''
-    param dict LED_array: key=int corresponding to an LED, value=[anode_pin, cathode_pin]
-    
-    Sets all pins to mode 1 (write), sets all pins to low voltage (write(0)), then sets all pins to mode 0 (read).
-    Loops over all LEDs in LED_array to do so.
-    Read mode (0) with low voltage (0) pre-set for write mode (1) is used as default for all pins.
+    Sets all pins to their default off positions by looping over a dictionary of LED connections.
+    Turns all LEDs' pins to write mode (1), sets pins to low V (write(0)), turns pins to read mode (0).
+    Parameters:
+        LED_array (dictionary): Represents the LEDs and their connections to the Arduino board
+            Keys are ints corresponding to LEDs; each LED is assigned an int key
+            Values are 1D lists containing Arduino pin objects on the board in the form [anode_pin, cathode_pin]
+    Returns:
+        None
     '''
-    
     for LED_num in LED_array:
-        row = LED_array[LED_num][0]
-        if row.mode != 1:
-            row.mode = 1
-        row.write(0)
-        row.mode = 0
+        anode = LED_array[LED_num][0]
+        if anode.mode != 1:
+            anode.mode = 1   # Write mode
+        anode.write(0)       # Low V
+        anode.mode = 0       # Read mode
         
-        col = LED_array[LED_num][1]
-        if col.mode != 1:
-            col.mode = 1
-        col.write(0)
-        col.mode = 0
+        cathode = LED_array[LED_num][1]
+        if cathode.mode != 1:
+            cathode.mode = 1 # Write mode
+        cathode.write(0)     # Low V
+        cathode.mode = 0     # Read mode
         
 def global_on(LED_array, read=True):
     '''
-    param dict LED_array: key=int corresponding to an LED, value=[anode_pin, cathode_pin]
-    param bool read: Default True sets all pins to read mode after being set to high voltage; False cancels this
-    
-    Sets all pins to mode 1 (write), sets all pins to high voltage (write(1)), then sets all pins to mode 0 (read).
-    Loops over all LEDs in LED_array to do so.
+    Sets all pins to the on position by looping over a dictionary of LED connections.
+    Turns all LEDs' pins to write mode (1), sets pins to high V (write(0)).
+    Parameters:
+        LED_array (dictionary): Represents the LEDs and their connections to the Arduino board
+            Keys are ints corresponding to LEDs; each LED is assigned an int key
+            Values are 1D lists containing Arduino pin objects on the board in the form [anode_pin, cathode_pin]
+        read (boolean): If True, after the main part of the function runs, all pins turn to read mode (0). If False, no effect.
+            Default Value: True
+    Returns:
+        None
     '''
     
     for LED_num in LED_array:
-        row = LED_array[LED_num][0]
-        if row.mode != 1:
-            row.mode = 1
-        row.write(1)
+        anode = LED_array[LED_num][0]
+        if anode.mode != 1:
+            anode.mode = 1   # Write mode
+        anode.write(1)       # High V
         
-        col = LED_array[LED_num][1]
-        if col.mode != 1:
-            col.mode = 1
-        col.write(1)
+        cathode = LED_array[LED_num][1]
+        if cathode.mode != 1:
+            cathode.mode = 1 # Write mode
+        cathode.write(1)     # High V
         
         if read:
-            row.mode = 0
-            col.mode = 0
+            anode.mode = 0   # Read mode
+            cathode.mode = 0 # Read mode
     
 def flash(LED_array, LED_num, num_flashes, half_flash_length=0.5):
     '''
-    param dict LED_array: key=int corresponding to an LED, value=[anode_pin, cathode_pin]
-    param int LED_num: Number corresponding to the LED that should flash
-    param int num_flashes: Number of times to flash LED l
-    param float half_flash_length: Time LED is turned on/off for (half the period of a flash) in seconds
-    
-    In one on-off cycle:
-        Turns on LED_num by setting anode/cathode to mode 1 (write) with low/high V, respectively.
-        Waits half_flash_length seconds.
-        Turns off LED_num by setting anode/cathode both to low V, then both to mode 0 (read).
-        Waits half_flash_length seconds.
-    Repeats for total of num_flashes on-off cycles.
+    Flashes an individual LED in on-off cycles. In one on-off cycle:
+        Turns on individual LED by setting anode/cathode both to mode 1 (write) with low/high V, respectively.
+        Waits a specified length of time.
+        Turns off individual LED by setting anode/cathode both to low V, then both to mode 0 (read).
+        Waits the same specified length of time.
+    Parameters:
+        LED_array (dictionary): Represents the LEDs and their connections to the Arduino board
+            Keys are ints corresponding to LEDs; each LED is assigned an int key
+            Values are 1D lists containing Arduino pin objects on the board in the form [anode_pin, cathode_pin]
+        LED_num (int): Key of LED in LED_array which should flash
+        num_flashes (int): Number of times to flash LED (number of on-off cycles)
+        half_flash_length (float): Specified time (in sec) LED is turned on/off for (half-period of flash)
+            Default Value: 0.5    Corresponds to 1 second period of flash
+    Returns:
+        None
     '''
-    
     # Retrieving anode and cathode
     [anode, cathode] = LED_array[LED_num]
     
@@ -135,18 +148,22 @@ def flash(LED_array, LED_num, num_flashes, half_flash_length=0.5):
         anode.mode = 0
         time.sleep(half_flash_length)
 
-def pwm(LED_array, LED_num, duty_cycle, duration=0.5):
+def pwm(LED_array, LED_num, V_apparent, duration=1.):
     '''
-    param dict LED_array: key=int corresponding to an LED, value=[anode_pin, cathode_pin]
-    param int LED_num: Number corresponding to the LED that should turn on
-    param float duty_cycle: Apparent voltage of LED (must be between 0 and 5, inclusive)
-    param float duration: Time (in seconds) that the LED should turn on for
-    
-    Sets anode to mode 1 (write) at low voltage. Sets cathode to mode 3 (PWM) and writes duty_cycle.
-    Delays duration seconds.
-    Writes 0 to cathode for low voltage. Sets both cathode and anode to mode 0 (read) for default conditions.
+    Does PWM on an LED. Sets anode to mode 1 (write) at low V, sets cathode to mode 3 (PWM) at V_apparent.
+    Delays a specified amount of time, sets cathode to low V, sets both cathode/anode to mode 0 (read) for default conditions.
+    Parameters:
+        LED_array (dictionary): Represents the LEDs and their connections to the Arduino board
+            Keys are ints corresponding to LEDs; each LED is assigned an int key
+            Values are 1D lists containing Arduino pin objects on the board in the form [anode_pin, cathode_pin]
+        LED_num (int): Key of LED in LED_array which should do PWM
+        V_apparent (float): Apparent voltage of LED from PWM
+            Must be between 0 (inclusive) and 5 (inclusive)
+        duration (float): Time (in seconds) that the LED should do PWM for
+            Default Value: 1.    Corresponds to 1 second of PWM.
+    Returns:
+        None
     '''
-    
     # Retrieving anode and cathode
     [anode, cathode] = LED_array[LED_num]
     
@@ -154,7 +171,7 @@ def pwm(LED_array, LED_num, duty_cycle, duration=0.5):
     anode.mode = 1
     anode.write(0)
     cathode.mode = 3
-    cathode.write(duty_cycle)
+    cathode.write(V_apparent)
     time.sleep(duration)
     
     # Turning the LED off
