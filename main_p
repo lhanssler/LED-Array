@@ -1,8 +1,8 @@
-import LED_Array
+# import LED_Array
 import numpy as np
 
 board = LED_Array.board_initializer('/dev/cu.usbserial-1420')
-file = np.loadtxt('/Users/logan-hanssler/Documents/Python Code for Arduino/PWM Data', skiprows=5)
+file = np.loadtxt('/Users/logan-hanssler/Documents/Python Code for Arduino/PCB Data', skiprows=5)
 LEDs = LED_Array.LED_setup(board, file)
 LED_Array.global_off(LEDs)
 
