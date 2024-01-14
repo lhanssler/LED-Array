@@ -116,7 +116,7 @@ def global_on(LED_array, read=True):
 def flash(LED_array, LED_num, num_flashes, half_flash_length=0.5):
     '''
     Flashes an individual LED in on-off cycles. In one on-off cycle:
-        Turns on individual LED by setting anode/cathode both to mode 1 (write) with low/high V, respectively.
+        Turns on individual LED by setting anode/cathode both to mode 1 (write) with high/low V, respectively.
         Waits a specified length of time.
         Turns off individual LED by setting anode/cathode both to low V, then both to mode 0 (read).
         Waits the same specified length of time.
@@ -139,19 +139,19 @@ def flash(LED_array, LED_num, num_flashes, half_flash_length=0.5):
         # Turning the LED on
         anode.mode = 1
         cathode.mode = 1
-        cathode.write(1)
+        anode.write(1)
         time.sleep(half_flash_length)
         
         # Turning the LED off
-        cathode.write(0)
-        cathode.mode = 0
+        anode.write(0)
         anode.mode = 0
+        cathode.mode = 0
         time.sleep(half_flash_length)
 
 def pwm(LED_array, LED_num, V_apparent, duration=1.):
     '''
-    Does PWM on an LED. Sets anode to mode 1 (write) at low V, sets cathode to mode 3 (PWM) at V_apparent.
-    Delays a specified amount of time, sets cathode to low V, sets both cathode/anode to mode 0 (read) for default conditions.
+    Does PWM on an LED. Sets cathode to mode 1 (write) at low V, sets anode to mode 3 (PWM) at V_apparent.
+    Delays a specified amount of time, sets anode to low V, sets both cathode/anode to mode 0 (read) for default conditions.
     Parameters:
         LED_array (dictionary): Represents the LEDs and their connections to the Arduino board
             Keys are ints corresponding to LEDs; each LED is assigned an int key
@@ -168,13 +168,13 @@ def pwm(LED_array, LED_num, V_apparent, duration=1.):
     [anode, cathode] = LED_array[LED_num]
     
     # Turning the LED on
-    anode.mode = 1
-    anode.write(0)
-    cathode.mode = 3
-    cathode.write(V_apparent)
+    cathode.mode = 1
+    cathode.write(0)
+    anode.mode = 3
+    anode.write(V_apparent)
     time.sleep(duration)
     
     # Turning the LED off
-    cathode.write(0)
-    cathode.mode = 0
+    anode.write(0)
     anode.mode = 0
+    cathode.mode = 0
