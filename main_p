@@ -1,5 +1,6 @@
 # import LED_Array
 import numpy as np
+import LED_Array
 
 board = LED_Array.board_initializer('/dev/cu.usbserial-1420')
 file = np.loadtxt('/Users/logan-hanssler/Documents/Python Code for Arduino/PCB Data', skiprows=5)
