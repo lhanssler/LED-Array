@@ -1,0 +1,18 @@
+# import LED_Array
+import numpy as np
+import LED_Array
+
+board = LED_Array.board_initializer('/dev/cu.usbserial-1420')
+file = np.loadtxt('/Users/logan-hanssler/Documents/Python Code for Arduino/PCB Data', skiprows=5)
+LEDs = LED_Array.LED_setup(board, file)
+LED_Array.global_off(LEDs)
+
+V_multipliers = np.append(np.arange(0, 20) / 20, np.flip(np.arange(0, 21) / 20))
+
+while True:
+    # Cycles through LEDs and gradually makes them get brighter then dimmer
+    for LED_num_input in range(1, 31):
+        # LED_num_input cycles through every LED in setup
+        for V_multiplier_input in V_multipliers:
+            # V_multiplier_input rises from 0. to 1., then falls back to 0., in increments of 0.05
+            LED_Array.pwm(LEDs, LED_num_input, V_multiplier_input, 0.025)
