@@ -148,17 +148,18 @@ def flash(LED_array, LED_num, num_flashes, half_flash_length=0.5):
         cathode.mode = 0
         time.sleep(half_flash_length)
 
-def pwm(LED_array, LED_num, V_apparent, duration=1.):
+def pwm(LED_array, LED_num, V_multiplier, duration=1.):
     '''
-    Does PWM on an LED. Sets cathode to mode 1 (write) at low V, sets anode to mode 3 (PWM) at V_apparent.
+    Does PWM on an LED. Sets cathode to mode 1 (write) at low V, sets anode to mode 3 (PWM) at V_multiplier.
     Delays a specified amount of time, sets anode to low V, sets both cathode/anode to mode 0 (read) for default conditions.
     Parameters:
         LED_array (dictionary): Represents the LEDs and their connections to the Arduino board
             Keys are ints corresponding to LEDs; each LED is assigned an int key
             Values are 1D lists containing Arduino pin objects on the board in the form [anode_pin, cathode_pin]
         LED_num (int): Key of LED in LED_array which should do PWM
-        V_apparent (float): Apparent voltage of LED from PWM
-            Must be between 0 (inclusive) and 5 (inclusive)
+        V_apparent (float): Voltage multiplier of LED for PWM
+            Must be between 0 (inclusive) and 1 (inclusive)
+            Apparent voltage across LED would be 5.0 * V_multiplier
         duration (float): Time (in seconds) that the LED should do PWM for
             Default Value: 1.    Corresponds to 1 second of PWM.
     Returns:
@@ -171,7 +172,7 @@ def pwm(LED_array, LED_num, V_apparent, duration=1.):
     cathode.mode = 1
     cathode.write(0)
     anode.mode = 3
-    anode.write(V_apparent)
+    anode.write(V_multiplier)
     time.sleep(duration)
     
     # Turning the LED off
